@@ -12,6 +12,7 @@
 <nav class="pagination container" aria-label="Pagination">
     @if (Model.Any())
     {
+        <button type="button" class="btn btn-primary">Primary</button>
         <a rel="prev" href="@ViewData["prev"]" title="Older posts">&laquo; Older</a>
     }
     @if (currentPage > 0)
