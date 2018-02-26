@@ -35,6 +35,7 @@ namespace Miniblog.Core
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseKestrel(a => a.AddServerHeader = false)
+                .UseUrls("http://0.0.0.0:5000")
                 .Build();
 
         public IConfiguration Configuration { get; }
@@ -91,6 +92,7 @@ namespace Miniblog.Core
             // Bundling, minification and Sass transpilation (https://github.com/ligershark/WebOptimizer)
             services.AddWebOptimizer(pipeline =>
             {
+                pipeline.CompileMarkdownFiles();
                 pipeline.MinifyJsFiles();
                 pipeline.CompileScssFiles()
                         .InlineImages(1);
@@ -135,6 +137,8 @@ namespace Miniblog.Core
 
             app.UseOutputCaching();
             app.UseWebMarkupMin();
+
+            
 
             app.UseMvc(routes =>
             {
