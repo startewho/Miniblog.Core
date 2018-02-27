@@ -12,6 +12,7 @@ using WebEssentials.AspNetCore.OutputCaching;
 using WebMarkupMin.AspNetCore2;
 using WebMarkupMin.Core;
 using WilderMinds.MetaWeblog;
+using NLog.Web;
 
 using IWmmLogger = WebMarkupMin.Core.Loggers.ILogger;
 using MetaWeblogService = Miniblog.Core.Services.MetaWeblogService;
@@ -36,6 +37,7 @@ namespace Miniblog.Core
                 .UseStartup<Startup>()
                 .UseKestrel(a => a.AddServerHeader = false)
                 .UseUrls("http://0.0.0.0:5000")
+                .UseNLog()  // NLog: setup NLog for Dependency injection
                 .Build();
 
         public IConfiguration Configuration { get; }
@@ -50,6 +52,8 @@ namespace Miniblog.Core
             services.Configure<BlogSettings>(Configuration.GetSection("blog"));
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddMetaWeblog<MetaWeblogService>();
+
+           
 
             // Progressive Web Apps https://github.com/madskristensen/WebEssentials.AspNetCore.ServiceWorker
             services.AddProgressiveWebApp(new WebEssentials.AspNetCore.Pwa.PwaOptions

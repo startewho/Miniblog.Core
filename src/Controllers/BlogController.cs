@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Miniblog.Core.Models;
 using Miniblog.Core.Services;
@@ -18,8 +19,10 @@ namespace Miniblog.Core.Controllers
         private readonly IOptionsSnapshot<BlogSettings> _settings;
         private readonly WebManifest _manifest;
 
-        public BlogController(IBlogService blog, IOptionsSnapshot<BlogSettings> settings, WebManifest manifest)
+        private readonly ILogger<BlogController> _logger;
+        public BlogController(IBlogService blog, ILogger<BlogController> logger, IOptionsSnapshot<BlogSettings> settings, WebManifest manifest)
         {
+            _logger = logger;
             _blog = blog;
             _settings = settings;
             _manifest = manifest;
@@ -34,6 +37,8 @@ namespace Miniblog.Core.Controllers
             ViewData["Description"] = _manifest.Description;
             ViewData["prev"] = $"/{page + 1}/";
             ViewData["next"] = $"/{(page <= 1 ? null : page - 1 + "/")}";
+
+            _logger.LogInformation($"访问了主页{DateTime.Now}");
             return View("~/Views/Blog/Index.cshtml", posts);
         }
 

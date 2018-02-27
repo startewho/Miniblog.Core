@@ -17,20 +17,24 @@ a.noline {
         min-width: 50px;
     }
 
+    .caption{
+        margin: 0 -15px;
+    }
+
     input {
         font: inherit;
 
-        &[type=text] {
+        /*&[type=text] {
             border-radius: 3px;
             border: 1px solid #bbb;
             padding: 4px 10px;
-            width: 100%;
-            max-width: 400px;
+          
+           
         }
 
         &[type=submit] {
             padding: 0 10px;
-        }
+        }*/
     }
 
     input + span,
@@ -49,6 +53,7 @@ a.noline {
         border: 1px solid #bbb;
         padding: 5px;
         width: 100%;
+        margin:0 15px;
     }
 
     .delete {
