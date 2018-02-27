@@ -40,7 +40,7 @@
 
     <header class="siteheader">
         <div class="container">
-            <p itemprop="name"><a href="~/">@manifest.Name</a></p>
+            <p itemprop="name"><a href="~/">@settings.Value.BlogName</a></p>
             By <span itemprop="author">@settings.Value.Owner</span>
         </div>
     </header>
@@ -61,18 +61,20 @@
 
                         if (User.Identity.IsAuthenticated)
                         {
-                            <li><a asp-controller="Blog" asp-action="Edit">New post</a></li>
-                            <li><a href="~/logout/" title="Sign out as administrator">Sign out</a></li>
+                            <li><a class="btn btn-primary" asp-controller="Blog" asp-action="Edit" role="button">New post</a></li>
+                   
+                            <li><a class="btn btn-primary" href="~/logout/" title="Sign out as administrator" role="button">Sign out</a></li>
                         }
                         else
                         {
-                            <li><a href="~/login/?returnUrl=@path" rel="nofollow" title="Sign in as administrator">Sign in</a></li>
+                            <li><a class="btn btn-primary" href="~/login/?returnUrl=@path" rel="nofollow" title="Sign in as administrator" role="button">Sign in</a>
+                            </li>
                         }
                     }
                 </ul>
             </nav>
             <p>
-                Powered by <a href="https://github.com/madskristensen/Miniblog.Core" rel="noopener noreferrer" target="_blank">Miniblog.Core</a>
+                基于 <a href="https://github.com/madskristensen/Miniblog.Core" rel="noopener noreferrer" target="_blank">Miniblog.Core</a>
             </p>
         </div>
     </footer>

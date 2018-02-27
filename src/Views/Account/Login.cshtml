@@ -12,13 +12,25 @@
     <div asp-validation-summary="All"></div>
     <fieldset>
         <legend id="legend">Sign in</legend>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">UserName</span>
+            </div>
+            <input type="text" asp-for="UserName" class="form-control" autofocus aria-label="UserName" aria-describedby="inputGroup-sizing-default">
+        </div>
 
-        <input asp-for="UserName" aria-label="Username" autofocus required placeholder="Username" />
-        <input asp-for="Password" aria-label="Password" required placeholder="Password" />
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default"> Password </span>
+            </div>
+            <input type="password" asp-for="Password" class="form-control" required aria-label="Password" aria-describedby="inputGroup-sizing-default">
+        </div>
 
-        <input asp-for="RememberMe" />
+        
+        <input class="auto-login" type="checkbox" aria-label="Checkbox for following text input" asp-for="RememberMe" />
         <label asp-for="RememberMe">Remember me</label>
-
-        <input type="submit" value="Sign in" />
+        <div>
+            <input class="btn btn-primary" type="submit" value="Sign in">
+        </div>
     </fieldset>
 </form>

@@ -30,7 +30,7 @@ namespace Miniblog.Core.Controllers
         public async Task<IActionResult> Index([FromRoute]int page = 0)
         {
             var posts = await _blog.GetPosts(_settings.Value.PostsPerPage, _settings.Value.PostsPerPage * page);
-            ViewData["Title"] = _manifest.Name;
+            ViewData["Title"] = _settings.Value.BlogName;
             ViewData["Description"] = _manifest.Description;
             ViewData["prev"] = $"/{page + 1}/";
             ViewData["next"] = $"/{(page <= 1 ? null : page - 1 + "/")}";
@@ -42,7 +42,7 @@ namespace Miniblog.Core.Controllers
         public async Task<IActionResult> Category(string category, int page = 0)
         {
             var posts = (await _blog.GetPostsByCategory(category)).Skip(_settings.Value.PostsPerPage * page).Take(_settings.Value.PostsPerPage);
-            ViewData["Title"] = _manifest.Name + " " + category;
+            ViewData["Title"] = _settings.Value.BlogName + " " + category;
             ViewData["Description"] = $"Articles posted in the {category} category";
             ViewData["prev"] = $"/blog/category/{category}/{page + 1}/";
             ViewData["next"] = $"/blog/category/{category}/{(page <= 1 ? null : page - 1 + "/")}";
