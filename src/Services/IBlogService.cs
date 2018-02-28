@@ -11,6 +11,8 @@ namespace Miniblog.Core.Services
     {
         Task<IEnumerable<Post>> GetPosts(int count, int skip = 0);
 
+        Task<IEnumerable<Post>> GetPostsByTitle(int count, string title);
+
         Task<IEnumerable<Post>> GetPostsByCategory(string category);
 
         Task<Post> GetPostBySlug(string slug);
@@ -114,6 +116,17 @@ namespace Miniblog.Core.Services
         protected bool IsAdmin()
         {
             return ContextAccessor.HttpContext?.User?.Identity.IsAuthenticated == true;
+        }
+
+        public Task<IEnumerable<Post>> GetPostsByTitle(int count, string title)
+        {
+            bool isAdmin = IsAdmin();
+
+            var posts = Cache
+                .Where(p => p.PubDate <= DateTime.UtcNow && (p.IsPublished || isAdmin) && p.Title.Contains(title))
+                .Take(count);
+
+            return Task.FromResult(posts);
         }
     }
 }

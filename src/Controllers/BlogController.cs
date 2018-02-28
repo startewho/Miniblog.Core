@@ -42,6 +42,9 @@ namespace Miniblog.Core.Controllers
             return View("~/Views/Blog/Index.cshtml", posts);
         }
 
+      
+
+
         [Route("/blog/category/{category}/{page:int?}")]
         [OutputCache(Profile = "default")]
         public async Task<IActionResult> Category(string category, int page = 0)

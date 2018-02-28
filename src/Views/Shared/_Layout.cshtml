@@ -37,7 +37,43 @@
     @RenderSection("Head", required: false)
 </head>
 <body itemscope itemtype="http://schema.org/WebPage">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="~/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              
+                <li class="nav-item">
+                    <a class="nav-link" href="~/blog/category/asp.net">Asp.Net</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="~/blog/category/life">Life</a>
+                </li>
+                @*<li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>*@
+
+                <li class="nav-item">
+                    <a class="nav-link" href="~/about">About</a>
+                </li>
+            </ul>
+            <form class="form-inline my-4 my-lg-0" action="~/search" method="post">
+                <input class="form-control mr-sm-4" type="text" name="query" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0"  type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
     <header class="siteheader">
         <div class="container">
             <p itemprop="name"><a href="~/">@settings.Value.BlogName</a></p>
@@ -62,12 +98,13 @@
                         if (User.Identity.IsAuthenticated)
                         {
                             <li><a class="btn btn-primary" asp-controller="Blog" asp-action="Edit" role="button">New post</a></li>
-                   
+
                             <li><a class="btn btn-primary" href="~/logout/" title="Sign out as administrator" role="button">Sign out</a></li>
                         }
                         else
                         {
-                            <li><a class="btn btn-primary" href="~/login/?returnUrl=@path" rel="nofollow" title="Sign in as administrator" role="button">Sign in</a>
+                            <li>
+                                <a class="btn btn-primary" href="~/login/?returnUrl=@path" rel="nofollow" title="Sign in as administrator" role="button">Sign in</a>
                             </li>
                         }
                     }
@@ -82,6 +119,10 @@
     <!-- This lazy loads the stylesheet in a non-render blocking way -->
     <link rel="preload" href="~/css/belowthefold.scss" as="style" />
     <link rel="stylesheet" href="~/lib/bootstrap/scss/bootstrap.scss" />
+    <script type="text/javascript" src="~/lib/jQuery/dist/jquery.js"></script>
+    <script type="text/javascript" src="~/lib/Popper/popper.min.js" ></script>
+    <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.js" ></script>
+
     <noscript><link rel="stylesheet" href="~/css/belowthefold.scss" /></noscript>
 
     <script src="~/js/site.js" async defer></script>

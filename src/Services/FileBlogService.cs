@@ -281,5 +281,15 @@ namespace Miniblog.Core.Services
             return _contextAccessor.HttpContext?.User?.Identity.IsAuthenticated == true;
         }
 
+        public Task<IEnumerable<Post>> GetPostsByTitle(int count, string title)
+        {
+            bool isAdmin = IsAdmin();
+
+            var posts = _cache
+                .Where(p => p.PubDate <= DateTime.UtcNow && (p.IsPublished || isAdmin)&&p.Title.Contains(title))
+                .Take(count);
+
+            return Task.FromResult(posts);
+        }
     }
 }
