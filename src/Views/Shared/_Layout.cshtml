@@ -34,98 +34,240 @@
     <link rel="edituri" type="application/rsd+xml" title="RSD" href="~/rsd.xml" />
     <link rel="alternate" type="application/rss+xml" href="~/feed/rss/" />
     <link rel="alternate" type="application/atom+xml" href="~/feed/atom/" />
+    <script src="~/lib/Proton/build/proton.min.js"></script>
     @RenderSection("Head", required: false)
 </head>
 <body itemscope itemtype="http://schema.org/WebPage">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="~/">Home</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <div>
+        <canvas id="canvas"></canvas>
+        <script>
+            var canvas;
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              
-                <li class="nav-item">
-                    <a class="nav-link" href="/blog/category/asp.net">Asp.Net</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/blog/category/life">Life</a>
-                </li>
-                @*<li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>*@
+            var context;
+            var proton;
+            var renderer;
+            var emitter, pointZone;
+            var R, num;
+            var pointer;
 
-                <li class="nav-item">
-                    <a class="nav-link" href="~/about">About</a>
-                </li>
-            </ul>
-            <form class="form-inline my-4 my-lg-0" action="~/search" method="post">
-                <input class="form-control mr-sm-4" type="text" name="query" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0"  type="submit">Search</button>
-            </form>
-        </div>
-    </nav>
-    <header class="siteheader">
-        <div class="container">
-            <p itemprop="name"><a href="~/">@settings.Value.BlogName</a></p>
-            By <span itemprop="author">@settings.Value.Owner</span>
-        </div>
-    </header>
+            main();
 
-    <main itemprop="mainEntity" itemscope itemtype="http://schema.org/Blog">
-        <noscript>
-            <p class="container">Some features of this website do not work as expected when JavaScript is disabled</p>
-        </noscript>
-        @RenderBody()
-    </main>
+            function main() {
+                num = Math.min(parseInt(window.innerWidth / (1000 / 145)), 400);
+                R = 140;
+                pointer = { x: 0, y: 0, r: 0 };
 
-    <footer class="sitefooter">
-        <div class="container">
-            <nav>
-                <ul>
-                    @{
-                        string path = Context.Request.Path;
+                initCanvas();
+                createProton(num);
+                setTimeout(addMouseEvent, 200);
+                addRenderer();
+                tick();
+            }
 
-                        if (User.Identity.IsAuthenticated)
-                        {
-                            <li><a class="btn btn-primary" asp-controller="Blog" asp-action="Edit" role="button">New post</a></li>
+            function initCanvas() {
+                canvas = document.getElementById("canvas");
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                console.log(canvas.height);
+                console.log(canvas.width);
+                context = canvas.getContext('2d');
+            }
 
-                            <li><a class="btn btn-primary" href="~/logout/" title="Sign out as administrator" role="button">Sign out</a></li>
+            function createProton(num) {
+                proton = new Proton;
+
+                emitter = new Proton.Emitter();
+                emitter.rate = new Proton.Rate(new Proton.Span(num), new Proton.Span(.05, .2));
+
+                emitter.addInitialize(new Proton.Mass(1));
+                emitter.addInitialize(new Proton.Radius(1, 4));
+                emitter.addInitialize(new Proton.Life(Infinity));
+
+                pointZone = new Proton.Position(new Proton.RectZone(0, 0, canvas.width, canvas.height));
+                emitter.addInitialize(pointZone);
+                emitter.addInitialize(new Proton.Velocity(new Proton.Span(.3, .6), new Proton.Span(0, 360), 'polar'));
+
+                emitter.addBehaviour(new Proton.Alpha(Proton.getSpan(0.2, .9)));
+                emitter.addBehaviour(new Proton.Color('#ff0'));
+                emitter.addBehaviour(new Proton.CrossZone(new Proton.RectZone(0, 0, canvas.width, canvas.height), 'cross'));
+
+                emitter.emit('once');
+                emitter.damping = 0;
+                proton.addEmitter(emitter);
+            }
+
+            function addRenderer() {
+                renderer = new Proton.CanvasRenderer(canvas);
+                renderer.onProtonUpdateAfter = function () {
+                    var particles = emitter.particles;
+
+                    for (var i = 0; i < particles.length; i++) {
+                        for (var j = i + 1; j < particles.length; j++) {
+                            var pA = particles[i];
+                            var pB = particles[j];
+                            var dis = pA.p.distanceTo(pB.p);
+
+                            if (dis < R) {
+                                var alpha = (1 - dis / R) * .5;
+                                context.strokeStyle = 'rgba(255,255,0,' + alpha + ')';
+                                context.beginPath();
+                                context.moveTo(pA.p.x, pA.p.y);
+                                context.lineTo(pB.p.x, pB.p.y);
+                                context.closePath();
+                                context.stroke();
+                            }
+                        }
+                    }
+                }
+
+                proton.addRenderer(renderer);
+            }
+
+            function addMouseEvent() {
+                emitter.rate = new Proton.Rate(new Proton.Span(3), .5);
+                emitter.removeInitialize(pointZone);
+
+                document.body.addEventListener('mousedown', function (e) {
+                    for (var i = 0; i < 3; i++)
+                        emitter.particles[i].dead = true;
+
+                    setTimeout(function () {
+                        emitter.p.x = getPos(e).x;
+                        emitter.p.y = getPos(e).y;
+                        emitter.emit('once');
+                    }, 60);
+                });
+
+                document.body.addEventListener('mouseup', function (e) {
+                    emitter.stop();
+                });
+
+                document.body.addEventListener('mousemove', function (e) {
+                    var p0 = emitter.particles[0];
+                    p0.radius = 0;
+                    var ease = .3;
+
+                    p0.p.x += (getPos(e).x - p0.p.x) * ease;
+                    p0.p.y += (getPos(e).y - p0.p.y) * ease;
+                });
+            }
+
+            ///
+            var _pos = { x: 0, y: 0 };
+            function getPos(e) {
+                if (e.layerX !== undefined) {
+                    _pos.x = e.layerX;
+                    _pos.y = e.layerY;
+                } else if (e.offsetX !== undefined) {
+                    _pos.x = e.offsetX;
+                    _pos.y = e.offsetY;
+                }
+
+                return _pos;
+            }
+
+            function tick() {
+                requestAnimationFrame(tick);
+
+                proton.update();
+                proton.stats.update(3);
+            }
+        </script>
+        <div style="position:relative;top:0;left:0">
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="~/">Home</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/category/asp.net">Asp.Net</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/category/life">Life</a>
+                        </li>
+                        @*<li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Dropdown
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
+                        </li>*@
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/about">About</a>
+                        </li>
+                    </ul>
+                    <form class="form-inline my-4 my-lg-0" action="~/search" method="post">
+                        <input class="form-control mr-sm-4" type="text" name="query" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+                </div>
+            </nav>
+            <header class="siteheader">
+                <div class="container">
+                    <p itemprop="name"><a href="~/">@settings.Value.BlogName</a></p>
+                    By <span itemprop="author">@settings.Value.Owner</span>
+                </div>
+            </header>
+
+
+
+            <main itemprop="mainEntity" itemscope itemtype="http://schema.org/Blog">
+                <noscript>
+                    <p class="container">Some features of this website do not work as expected when JavaScript is disabled</p>
+                </noscript>
+                @RenderBody()
+            </main>
+
+            <footer class="sitefooter">
+                <div class="container">
+                    <nav>
+                        <ul>
+                            @{
+                            string path = Context.Request.Path;
+
+                            if (User.Identity.IsAuthenticated)
+                            {
+                                <li><a class="btn btn-primary" asp-controller="Blog" asp-action="Edit" role="button">New post</a></li>
+
+                                <li><a class="btn btn-primary" href="~/logout/" title="Sign out as administrator" role="button">Sign out</a></li>
                         }
                         else
                         {
                             <li>
                                 <a class="btn btn-primary" href="~/login/?returnUrl=@path" rel="nofollow" title="Sign in as administrator" role="button">Sign in</a>
                             </li>
-                        }
                     }
-                </ul>
-            </nav>
-            <p>
-                基于 <a href="https://github.com/madskristensen/Miniblog.Core" rel="noopener noreferrer" target="_blank">Miniblog.Core</a>
-            </p>
+                            }
+                        </ul>
+                    </nav>
+                    <p>
+                        基于 <a href="https://github.com/madskristensen/Miniblog.Core" rel="noopener noreferrer" target="_blank">Miniblog.Core</a>
+                    </p>
+                </div>
+            </footer>
+
+            <!-- This lazy loads the stylesheet in a non-render blocking way -->
+            <link rel="preload" href="~/css/belowthefold.scss" as="style" />
+            <link rel="stylesheet" href="~/lib/bootstrap/scss/bootstrap.scss" />
+            <script type="text/javascript" src="~/lib/jQuery/dist/jquery.js"></script>
+            <script type="text/javascript" src="~/lib/Popper/popper.min.js"></script>
+            <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+            <noscript><link rel="stylesheet" href="~/css/belowthefold.scss" /></noscript>
+
+            <script src="~/js/site.js" async defer></script>
+            @RenderSection("Scripts", required: false)
         </div>
-    </footer>
-
-    <!-- This lazy loads the stylesheet in a non-render blocking way -->
-    <link rel="preload" href="~/css/belowthefold.scss" as="style" />
-    <link rel="stylesheet" href="~/lib/bootstrap/scss/bootstrap.scss" />
-    <script type="text/javascript" src="~/lib/jQuery/dist/jquery.js"></script>
-    <script type="text/javascript" src="~/lib/Popper/popper.min.js" ></script>
-    <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.js" ></script>
-
-    <noscript><link rel="stylesheet" href="~/css/belowthefold.scss" /></noscript>
-
-    <script src="~/js/site.js" async defer></script>
-    @RenderSection("Scripts", required: false)
+    </div>
 </body>
 </html>

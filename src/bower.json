@@ -3,6 +3,7 @@
   "private": true,
   "dependencies": {
     "bootstrap": "v4.0.0",
-    "jQuery": "3.2.0"
+    "jQuery": "3.2.0",
+    "Proton": "proton#v3.0.5"
   }
 }
