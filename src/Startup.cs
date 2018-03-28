@@ -80,24 +80,24 @@ namespace Miniblog.Core
                 });
 
             // HTML minification (https://github.com/Taritsyn/WebMarkupMin)
-            services
-                .AddWebMarkupMin(options =>
-                {
-                    options.AllowMinificationInDevelopmentEnvironment = true;
-                    options.DisablePoweredByHttpHeaders = true;
-                })
-                .AddHtmlMinification(options =>
-                {
-                    options.MinificationSettings.RemoveOptionalEndTags = false;
-                    options.MinificationSettings.WhitespaceMinificationMode = WhitespaceMinificationMode.Safe;
-                });
+            //services
+                //.AddWebMarkupMin(options =>
+                //{
+                //    options.AllowMinificationInDevelopmentEnvironment = false;
+                //    options.DisablePoweredByHttpHeaders = true;
+                //})
+                //.AddHtmlMinification(options =>
+                //{
+                //    options.MinificationSettings.RemoveOptionalEndTags = false;
+                //    options.MinificationSettings.WhitespaceMinificationMode = WhitespaceMinificationMode.Safe;
+                //});
             services.AddSingleton<IWmmLogger, WmmNullLogger>(); // Used by HTML minifier
 
             // Bundling, minification and Sass transpilation (https://github.com/ligershark/WebOptimizer)
             services.AddWebOptimizer(pipeline =>
             {
                 pipeline.CompileMarkdownFiles();
-                pipeline.MinifyJsFiles();
+                //pipeline.MinifyJsFiles();
                 pipeline.CompileScssFiles()
                         .InlineImages(1);
             });
@@ -140,7 +140,7 @@ namespace Miniblog.Core
             app.UseAuthentication();
 
             app.UseOutputCaching();
-            app.UseWebMarkupMin();
+            //app.UseWebMarkupMin();
 
             
 

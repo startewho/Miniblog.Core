@@ -113,7 +113,6 @@ noscript p {
 }
 
 .sitefooter {
-    
     bottom: 0;
     left: 0;
     width: 100%;
@@ -121,6 +120,7 @@ noscript p {
     color: white;
     height: $footer_height;
     font-size: .9em;
+    position: relative;
 
     .container {
         margin: 1em auto;
@@ -133,6 +133,10 @@ noscript p {
     }
 
     li {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
         display: inline-block;
 
         &:not(:last-child):not(:first-child):before {
@@ -150,8 +154,10 @@ noscript p {
 
     p {
         position: absolute;
-        bottom: .5em;
-        left: 0;
+        top: 50%;
+        left:0;
+        transform: translateY(-50%);
+       
         text-align: center;
         width: 100%;
         font-size: .9em;

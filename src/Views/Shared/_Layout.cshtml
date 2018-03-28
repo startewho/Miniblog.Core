@@ -38,7 +38,7 @@
     @RenderSection("Head", required: false)
 </head>
 <body itemscope itemtype="http://schema.org/WebPage">
-    <div>
+    <div id="content">
         <canvas id="canvas"></canvas>
         <script>
             var canvas;
@@ -59,7 +59,7 @@
 
                 initCanvas();
                 createProton(num);
-                setTimeout(addMouseEvent, 200);
+                setTimeout(addMouseEvent, 1000);
                 addRenderer();
                 tick();
             }
@@ -68,9 +68,17 @@
                 canvas = document.getElementById("canvas");
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
-                console.log(canvas.height);
-                console.log(canvas.width);
+        
                 context = canvas.getContext('2d');
+                window.onresize = function (e) {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                    var contentdiv = document.getElementsByTagName("main");
+                    if (contentdiv.innerHeight < window.innerHeight) {
+                        contentdiv.minHeight = window.innerHeight-80;
+                    }
+                    
+                }
             }
 
             function createProton(num) {
@@ -88,7 +96,7 @@
                 emitter.addInitialize(new Proton.Velocity(new Proton.Span(.3, .6), new Proton.Span(0, 360), 'polar'));
 
                 emitter.addBehaviour(new Proton.Alpha(Proton.getSpan(0.2, .9)));
-                emitter.addBehaviour(new Proton.Color('#ff0'));
+                emitter.addBehaviour(new Proton.Color('#ffffff'));
                 emitter.addBehaviour(new Proton.CrossZone(new Proton.RectZone(0, 0, canvas.width, canvas.height), 'cross'));
 
                 emitter.emit('once');
@@ -109,7 +117,7 @@
 
                             if (dis < R) {
                                 var alpha = (1 - dis / R) * .5;
-                                context.strokeStyle = 'rgba(255,255,0,' + alpha + ')';
+                                context.strokeStyle = 'rgba(0,255,255,' + alpha + ')';
                                 context.beginPath();
                                 context.moveTo(pA.p.x, pA.p.y);
                                 context.lineTo(pB.p.x, pB.p.y);
@@ -138,11 +146,11 @@
                     }, 60);
                 });
 
-                document.body.addEventListener('mouseup', function (e) {
+                canvas.addEventListener('mouseup', function (e) {
                     emitter.stop();
                 });
 
-                document.body.addEventListener('mousemove', function (e) {
+                canvas.addEventListener('mousemove', function (e) {
                     var p0 = emitter.particles[0];
                     p0.radius = 0;
                     var ease = .3;
