@@ -42,7 +42,15 @@ namespace Miniblog.Core.Controllers
             return View("~/Views/Blog/Index.cshtml", posts);
         }
 
-      
+
+        [Route("/blog/all")]
+        [OutputCache(Profile = "default")]
+        public async Task<IActionResult> Category11()
+        {
+            var post = new Comment{ ID = "ff" };
+            await Task.Delay(1);
+            return Ok(post);
+        }
 
 
         [Route("/blog/category/{category}/{page:int?}")]

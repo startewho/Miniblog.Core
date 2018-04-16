@@ -68,7 +68,7 @@
             images = document.body.querySelectorAll("[data-src]");
             viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
             var maincontent = document.getElementsByTagName("main")[0];
-            maincontent.style.minHeight = (window.innerHeight-210).toString()+"px";
+            maincontent.style.minHeight = (window.innerHeight-300).toString()+"px";
             maincontent.style.Height = "auto";
             
             lazyload(0);

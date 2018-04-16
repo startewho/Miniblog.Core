@@ -13,10 +13,12 @@ using WebMarkupMin.AspNetCore2;
 using WebMarkupMin.Core;
 using WilderMinds.MetaWeblog;
 using NLog.Web;
+using WebEssentials.AspNetCore.Serialization;
 
 using IWmmLogger = WebMarkupMin.Core.Loggers.ILogger;
 using MetaWeblogService = Miniblog.Core.Services.MetaWeblogService;
 using WmmNullLogger = WebMarkupMin.Core.Loggers.NullLogger;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Miniblog.Core
 {
@@ -45,7 +47,14 @@ namespace Miniblog.Core
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                //options.RespectBrowserAcceptHeader = true; // false by default
+                options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+            })
+            .AddXmlSerializerFormatters();
+           
+           
 
             services.AddSingleton<IUserServices, BlogUserServices>();
             services.AddSingleton<IBlogService, FileBlogService>();
@@ -140,9 +149,11 @@ namespace Miniblog.Core
             app.UseAuthentication();
 
             app.UseOutputCaching();
+
+
             //app.UseWebMarkupMin();
 
-            
+           
 
             app.UseMvc(routes =>
             {
@@ -150,6 +161,8 @@ namespace Miniblog.Core
                     name: "default",
                     template: "{controller=Blog}/{action=Index}/{id?}");
             });
+
+            app.UseSerialization(new SerializationOption { SerializeJson = true, SerializeXml = true });
         }
     }
 }
